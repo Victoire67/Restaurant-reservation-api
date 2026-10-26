@@ -1,0 +1,33 @@
+services:
+  postgres:
+    image: postgis/postgis:16-3.4 # PostgreSQL 16 + PostGIS (needed for the GiST location search)
+    container_name: restaurant_postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - "${POSTGRES_PORT}:5432" # your machine's port : container's port
+    volumes:
+      - pg_data:/var/lib/postgresql/data # keeps data when the container restarts
+
+  redis:
+    image: redis:7
+    container_name: restaurant_redis
+    ports:
+      - "${REDIS_PORT}:6379"
+
+  mongo:
+    image: mongo:7
+    container_name: restaurant_mongo
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - mongo_data:/data/db
+
+volumes:
+  pg_data:
+  mongo_data:
