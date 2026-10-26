@@ -1,0 +1,10 @@
+# Virtual environment (Poetry recreates it from poetry.lock)
+.venv/
+
+# Python cache files
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# Secrets
+.env
