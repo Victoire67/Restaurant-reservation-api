@@ -9,4 +9,5 @@ __pycache__/
 # Secrets
 .env
 
-/app/try_know.Poetry
+# Personal scratch file
+/app/try_know.py
