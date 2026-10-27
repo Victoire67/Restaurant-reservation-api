@@ -8,3 +8,5 @@ __pycache__/
 
 # Secrets
 .env
+
+/app/try_know.Poetry
