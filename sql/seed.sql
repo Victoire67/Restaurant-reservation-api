@@ -3,7 +3,7 @@
 -- Re-runnable: empties every table and resets ids to 1 first.
 -- =====================================================================
 
-BEGIN TRANSATION;
+BEGIN TRANSACTION;
 
 -- 1. Reset ---------------------------------------------------------------
 TRUNCATE reviews, reservations, restaurant_tables, restaurants, customers, cities
