@@ -4,10 +4,12 @@
 # Python cache files
 __pycache__/
 *.pyc
+temp_auto_push.bat
 .pytest_cache/
 
 # Secrets
 .env
 
 # Personal scratch file
-/app/try_know.py
+/app/try_know.py.gitignore
+branch_structure.json
