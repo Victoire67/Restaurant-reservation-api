@@ -78,20 +78,20 @@ def get_review(review_id):
     return review
 
 
+LATEST_REVIEWS_QUERY = """
+    SELECT id, restaurant_id, customer_id, rating, mongo_feedback_id, created_at
+    FROM reviews
+    WHERE restaurant_id = %(restaurant_id)s
+    ORDER BY created_at DESC, id DESC
+    LIMIT %(limit)s
+"""
+
+
 def get_restaurant_reviews(restaurant_id, limit=20):
     """Latest reviews of one restaurant, each with its text, newest first."""
     with get_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute(
-                """
-                SELECT id, restaurant_id, customer_id, rating, mongo_feedback_id, created_at
-                FROM reviews
-                WHERE restaurant_id = %s
-                ORDER BY created_at DESC, id DESC
-                LIMIT %s
-                """,
-                (restaurant_id, limit),
-            )
+            cur.execute(LATEST_REVIEWS_QUERY, {"restaurant_id": restaurant_id, "limit": limit})
             rows = cur.fetchall()
 
     # One Mongo query for all texts instead of one query per review
