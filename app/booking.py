@@ -3,6 +3,7 @@ from datetime import datetime
 
 from psycopg2 import errors
 
+from app.availability import invalidate_restaurant
 from app.db import get_connection
 
 
@@ -32,7 +33,8 @@ def book_reservation(
     """Book a table atomically and return the new reservation id.
 
     Runs as one transaction. The table row is locked first, so concurrent
-    requests for the same table are processed one at a time.
+    requests for the same table are processed one at a time. After the commit,
+    the restaurant's cached availability in Redis is invalidated.
     """
     if end_time <= start_time:
         raise ValueError("end_time must be after start_time")
@@ -43,13 +45,13 @@ def book_reservation(
         with conn.cursor() as cur:
             # 1. Lock the table row; other bookings for this table wait here until we finish
             cur.execute(
-                "SELECT capacity FROM restaurant_tables WHERE id = %s FOR UPDATE",
+                "SELECT capacity, restaurant_id FROM restaurant_tables WHERE id = %s FOR UPDATE",
                 (table_id,),
             )
             row = cur.fetchone()
             if row is None:
                 raise TableNotFound(f"Table {table_id} does not exist")
-            capacity = row[0]
+            capacity, restaurant_id = row
 
             # 2. The party must fit at the table
             if party_size > capacity:
@@ -85,7 +87,11 @@ def book_reservation(
             except errors.ExclusionViolation:
                 # Safety net from schema.sql caught an overlap the check above missed
                 raise TableUnavailable(f"Table {table_id} is already booked at that time")
-            return cur.fetchone()[0]
+            reservation_id = cur.fetchone()[0]
+
+    # 5. The transaction has committed: cached availability for this restaurant is now outdated
+    invalidate_restaurant(restaurant_id)
+    return reservation_id
 
 
 if __name__ == "__main__":
