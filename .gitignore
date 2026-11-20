@@ -8,8 +8,9 @@ temp_auto_push.bat
 .pytest_cache/
 
 # Secrets
-.env
 
 # Personal scratch file
 /app/try_know.py.gitignore
 branch_structure.json
+config.bat
+node_modules
